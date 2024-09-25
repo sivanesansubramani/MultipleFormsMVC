@@ -1,0 +1,53 @@
+﻿@model List<EmployeeFormApplication.Models.FormModel>
+
+@using (Html.BeginForm("Save", "Home", FormMethod.Post))
+{
+    <div id="formContainer">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="form-group clonedForm" id="form_@(i)">
+                @Html.TextBoxFor(m => m[i].FirstName, new { @name = $"forms[{i}].FirstName", @placeholder = "First Name", @class = "form-control" })
+                @Html.TextBoxFor(m => m[i].LastName, new { @name = $"forms[{i}].LastName", @placeholder = "Last Name", @class = "form-control" })
+                @Html.TextBoxFor(m => m[i].Age, new { @name = $"forms[{i}].Age", @placeholder = "Age", @class = "form-control", @type = "number" })
+                @Html.TextBoxFor(m => m[i].Email, new { @name = $"forms[{i}].Email", @placeholder = "Email", @class = "form-control" })
+                @Html.TextBoxFor(m => m[i].Gender, new { @name = $"forms[{i}].Gender", @placeholder = "Gender", @class = "form-control" })
+                @Html.TextBoxFor(m => m[i].MobileNumber, new { @name = $"forms[{i}].MobileNumber", @placeholder = "Mobile Number", @class = "form-control" })
+                <button type="button" class="removeButton">Remove</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" id="addButton">Add</button>
+    <button type="submit">Save</button>
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var index = @Model.Count; // Start with the number of existing forms
+
+            // Add new form
+            $('#addButton').click(function () {
+                var newForm = `
+                    <div class="form-group clonedForm" id="form_${index}">
+                        <input type="text" name="forms[${index}].FirstName" placeholder="First Name" class="form-control" />
+                        <input type="text" name="forms[${index}].LastName" placeholder="Last Name" class="form-control" />
+                        <input type="number" name="forms[${index}].Age" placeholder="Age" class="form-control" />
+                        <input type="email" name="forms[${index}].Email" placeholder="Email" class="form-control" />
+                        <input type="text" name="forms[${index}].Gender" placeholder="Gender" class="form-control" />
+                        <input type="text" name="forms[${index}].MobileNumber" placeholder="Mobile Number" class="form-control" />
+                        <button type="button" class="removeButton">Remove</button>
+                    </div>
+                `;
+                $('#formContainer').append(newForm);
+                index++; // Increment the index for next form
+            });
+
+            // Remove form
+            $(document).on('click', '.removeButton', function () {
+                $(this).closest('.clonedForm').remove();
+            });
+        });
+    </script>
+}
