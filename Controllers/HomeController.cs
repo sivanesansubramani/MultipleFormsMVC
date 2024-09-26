@@ -23,32 +23,53 @@ namespace EmployeeFormApplication.Controllers
         [HttpPost]
         public ActionResult Save(List<FormModel> forms)
         {
+            if (forms == null || !forms.Any())
+            {
+                ModelState.AddModelError("", "At least one form is required.");
+                return View("Index", forms);
+            }
 
             using (SqlConnection db = new SqlConnection(connectionString))
             {
-                string sqlQuery = @"INSERT INTO Bio (FirstName, LastName, Age, Email, Gender, MobileNumber)
-                                VALUES (@FirstName, @LastName, @Age, @Email, @Gender, @MobileNumber)";
+                string sqlQuery = @"INSERT INTO Bio (Name, PhoneNumber, Email, Gender, Skills, Address)
+                                    VALUES (@Name, @PhoneNumber, @Email, @Gender, @Skills, @Address)";
 
                 foreach (var form in forms)
                 {
-                    db.Execute(sqlQuery, form);
+                    if (!ModelState.IsValid)
+                    {
+                        return View("Index", forms);
+                    }
+
+                    var skills = form.Skills != null ? string.Join(",", form.Skills) : null;
+
+                    db.Execute(sqlQuery, new
+                    {
+                        form.Name,
+                        form.PhoneNumber,
+                        form.Email,
+                        form.Gender,
+                        Skills = skills,
+                        form.Address
+                    });
                 }
             }
+
             return RedirectToAction("Index");
         }
 
-        public ActionResult About()
+        [HttpGet]
+        public ActionResult list()
         {
-            ViewBag.Message = "Your application description page.";
+            List<SelectDataModel> forms = new List<SelectDataModel>();
 
-            return View();
-        }
+            using (SqlConnection db = new SqlConnection(connectionString))
+            {
+                string sqlQuery = "SELECT Name, PhoneNumber, Email, Gender, REPLACE(Skills,',',' ') as Skills, Address FROM Bio;";
+                forms = db.Query<SelectDataModel>(sqlQuery).ToList();
+            }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            return View(forms);
         }
     }
 }

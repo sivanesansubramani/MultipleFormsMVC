@@ -6,12 +6,32 @@
         @for (int i = 0; i < Model.Count; i++)
         {
             <div class="form-group clonedForm" id="form_@(i)">
-                @Html.TextBoxFor(m => m[i].FirstName, new { @name = $"forms[{i}].FirstName", @placeholder = "First Name", @class = "form-control" })
-                @Html.TextBoxFor(m => m[i].LastName, new { @name = $"forms[{i}].LastName", @placeholder = "Last Name", @class = "form-control" })
-                @Html.TextBoxFor(m => m[i].Age, new { @name = $"forms[{i}].Age", @placeholder = "Age", @class = "form-control", @type = "number" })
-                @Html.TextBoxFor(m => m[i].Email, new { @name = $"forms[{i}].Email", @placeholder = "Email", @class = "form-control" })
-                @Html.TextBoxFor(m => m[i].Gender, new { @name = $"forms[{i}].Gender", @placeholder = "Gender", @class = "form-control" })
-                @Html.TextBoxFor(m => m[i].MobileNumber, new { @name = $"forms[{i}].MobileNumber", @placeholder = "Mobile Number", @class = "form-control" })
+                @Html.TextBoxFor(m => m[i].Name, new { @name = $"forms[{i}].Name", @placeholder = "Name", @class = "form-control", @required = "required" })
+                @Html.TextBoxFor(m => m[i].PhoneNumber, new { @name = $"forms[{i}].PhoneNumber", @placeholder = "Phone Number", @class = "form-control", @required = "required", @type = "tel", pattern = "[0-9]{10}" })
+                @Html.TextBoxFor(m => m[i].Email, new { @name = $"forms[{i}].Email", @placeholder = "Email", @class = "form-control", @required = "required", @type = "email" })
+
+                <div>
+                    <label>Gender</label><br />
+                    @Html.RadioButtonFor(m => m[i].Gender, "Male", new { @name = $"forms[{i}].Gender" }) Male
+                    @Html.RadioButtonFor(m => m[i].Gender, "Female", new { @name = $"forms[{i}].Gender" }) Female
+                </div>
+
+                <div>
+                    <label>Skills</label><br />
+                    <input type="checkbox" name="forms[@i].Skills" value="C#" /> C#
+                    <input type="checkbox" name="forms[@i].Skills" value="SQL" /> SQL
+                    <input type="checkbox" name="forms[@i].Skills" value=".NET" /> .NET
+                    <input type="checkbox" name="forms[@i].Skills" value="Frontend" /> FrontEnd
+                    <input type="checkbox" name="forms[@i].Skills" value="Backend" /> Backend
+                    <input type="checkbox" name="forms[@i].Skills" value="AWS" /> AWS
+                    <input type="checkbox" name="forms[@i].Skills" value="Azure" /> Azure
+                </div>
+
+                <div>
+                    <label>Address</label><br />
+                    @Html.TextAreaFor(m => m[i].Address, new { @name = $"forms[{i}].Address", @placeholder = "Address", @class = "form-control", rows = "4" })
+                </div>
+
                 <button type="button" class="removeButton">Remove</button>
             </div>
         }
@@ -31,12 +51,28 @@
             $('#addButton').click(function () {
                 var newForm = `
                     <div class="form-group clonedForm" id="form_${index}">
-                        <input type="text" name="forms[${index}].FirstName" placeholder="First Name" class="form-control" />
-                        <input type="text" name="forms[${index}].LastName" placeholder="Last Name" class="form-control" />
-                        <input type="number" name="forms[${index}].Age" placeholder="Age" class="form-control" />
-                        <input type="email" name="forms[${index}].Email" placeholder="Email" class="form-control" />
-                        <input type="text" name="forms[${index}].Gender" placeholder="Gender" class="form-control" />
-                        <input type="text" name="forms[${index}].MobileNumber" placeholder="Mobile Number" class="form-control" />
+                        <input type="text" name="forms[${index}].Name" placeholder="Name" class="form-control" required />
+                        <input type="tel" name="forms[${index}].PhoneNumber" placeholder="Phone Number" class="form-control" required pattern="[0-9]{10}" />
+                        <input type="email" name="forms[${index}].Email" placeholder="Email" class="form-control" required />
+                        <div>
+                            <label>Gender</label><br />
+                            <input type="radio" name="forms[${index}].Gender" value="Male" /> Male
+                            <input type="radio" name="forms[${index}].Gender" value="Female" /> Female
+                        </div>
+                        <div>
+                            <label>Skills</label><br />
+                            <input type="checkbox" name="forms[${index}].Skills" value="C#" /> C#
+                            <input type="checkbox" name="forms[${index}].Skills" value="SQL" /> SQL
+                            <input type="checkbox" name="forms[${index}].Skills" value=".NET" /> .NET
+                            <input type="checkbox" name="forms[${index}].Skills" value="Frontend" /> Frontend
+                            <input type="checkbox" name="forms[${index}].Skills" value="Backend" /> Backend
+                            <input type="checkbox" name="forms[${index}].Skills" value="AWS" /> AWS
+                            <input type="checkbox" name="forms[${index}].Skills" value="Azure" /> Azure
+                        </div>
+                        <div>
+                            <label>Address</label><br />
+                            <textarea name="forms[${index}].Address" placeholder="Address" class="form-control" rows="4"></textarea>
+                        </div>
                         <button type="button" class="removeButton">Remove</button>
                     </div>
                 `;
@@ -49,5 +85,29 @@
                 $(this).closest('.clonedForm').remove();
             });
         });
+
+        $(document).ready(function () {
+            $('form').submit(function (e) {
+                var isValid = true;
+
+                // Check if at least one skill is checked
+                $('div[id^="form_"]').each(function () {
+                    var skillChecked = $(this).find('input[type="checkbox"]:checked').length > 0;
+                    if (!skillChecked) {
+                        isValid = false;
+                        $(this).find('#skillsError').text('Please select at least one skill.');
+                        window.alert("Select At Least One Skill");
+                    } else {
+                        $(this).find('#skillsError').text('');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+
     </script>
 }
